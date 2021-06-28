@@ -1,18 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>http://localhost:4000</id>
+    <id>https://paul-gao.com</id>
     <title>PaulGao</title>
-    <updated>2021-06-28T06:46:48.515Z</updated>
+    <updated>2021-06-28T06:49:57.733Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="http://localhost:4000"/>
-    <link rel="self" href="http://localhost:4000/atom.xml"/>
-    <logo>http://localhost:4000/images/avatar.png</logo>
-    <icon>http://localhost:4000/favicon.ico</icon>
+    <link rel="alternate" href="https://paul-gao.com"/>
+    <link rel="self" href="https://paul-gao.com/atom.xml"/>
+    <logo>https://paul-gao.com/images/avatar.png</logo>
+    <icon>https://paul-gao.com/favicon.ico</icon>
     <rights>All rights reserved 2021, PaulGao</rights>
     <entry>
+        <title type="html"><![CDATA[同步测试]]></title>
+        <id>https://paul-gao.com/post/tong-bu-ce-shi/</id>
+        <link href="https://paul-gao.com/post/tong-bu-ce-shi/">
+        </link>
+        <updated>2021-06-28T06:48:16.000Z</updated>
+        <content type="html"><![CDATA[<p>test</p>
+]]></content>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[搜索功能交互小结]]></title>
-        <id>http://localhost:4000/post/sou-suo-gong-neng-jiao-hu-xiao-jie/</id>
-        <link href="http://localhost:4000/post/sou-suo-gong-neng-jiao-hu-xiao-jie/">
+        <id>https://paul-gao.com/post/sou-suo-gong-neng-jiao-hu-xiao-jie/</id>
+        <link href="https://paul-gao.com/post/sou-suo-gong-neng-jiao-hu-xiao-jie/">
         </link>
         <updated>2021-06-28T06:00:15.000Z</updated>
         <summary type="html"><![CDATA[<p>总结一下对搜索功能的认识，搜索可归纳为<strong>输入、匹配和展示</strong>三大部分，从我的角度侧重讲输入与展示。搜索功能设计的关键指标是用户搜索成功率，搜索成功率可以从用户搜索完成后快速找到相关内容并点击来设定。搜索成功率的转化漏斗就是从输入、匹配到展示的转化，所以为了提高关键指标，我们需要让过程指标（如输入时间、输入次数、搜索准确率和召回率）完成的更好，以提高最终转化率。</p>
@@ -73,8 +82,8 @@
     </entry>
     <entry>
         <title type="html"><![CDATA[对企业管理的一点新认识]]></title>
-        <id>http://localhost:4000/post/dui-qi-ye-guan-li-de-yi-dian-xin-ren-shi/</id>
-        <link href="http://localhost:4000/post/dui-qi-ye-guan-li-de-yi-dian-xin-ren-shi/">
+        <id>https://paul-gao.com/post/dui-qi-ye-guan-li-de-yi-dian-xin-ren-shi/</id>
+        <link href="https://paul-gao.com/post/dui-qi-ye-guan-li-de-yi-dian-xin-ren-shi/">
         </link>
         <updated>2021-06-28T05:59:51.000Z</updated>
         <summary type="html"><![CDATA[<p>最近读了三本书《创新者的窘境》，《scrum精髓》和《奈飞文化手册》。在我看完《奈飞文化手册》之后，结合自己的工作经验，对三本书中共同讲到的内容很有感触。</p>
@@ -100,8 +109,8 @@
     </entry>
     <entry>
         <title type="html"><![CDATA[权限设计]]></title>
-        <id>http://localhost:4000/post/quan-xian-she-ji/</id>
-        <link href="http://localhost:4000/post/quan-xian-she-ji/">
+        <id>https://paul-gao.com/post/quan-xian-she-ji/</id>
+        <link href="https://paul-gao.com/post/quan-xian-she-ji/">
         </link>
         <updated>2021-06-28T05:59:21.000Z</updated>
         <summary type="html"><![CDATA[<p>文章来自网易UEDC – 蒋蕊遥。作者结合项目经历讲解RBAC权限系统设计实践。</p>
@@ -208,8 +217,8 @@
     </entry>
     <entry>
         <title type="html"><![CDATA[UML状态机在需求分析中的应用]]></title>
-        <id>http://localhost:4000/post/uml-zhuang-tai-ji-zai-xu-qiu-fen-xi-zhong-de-ying-yong/</id>
-        <link href="http://localhost:4000/post/uml-zhuang-tai-ji-zai-xu-qiu-fen-xi-zhong-de-ying-yong/">
+        <id>https://paul-gao.com/post/uml-zhuang-tai-ji-zai-xu-qiu-fen-xi-zhong-de-ying-yong/</id>
+        <link href="https://paul-gao.com/post/uml-zhuang-tai-ji-zai-xu-qiu-fen-xi-zhong-de-ying-yong/">
         </link>
         <updated>2021-06-28T05:58:39.000Z</updated>
         <content type="html"><![CDATA[<p>总结一下状态在需求分析中怎么使用。</p>
@@ -240,8 +249,8 @@
     </entry>
     <entry>
         <title type="html"><![CDATA[《贫困的终结》读后]]></title>
-        <id>http://localhost:4000/post/lesslesspin-kun-de-zhong-jie-greatergreater-du-hou/</id>
-        <link href="http://localhost:4000/post/lesslesspin-kun-de-zhong-jie-greatergreater-du-hou/">
+        <id>https://paul-gao.com/post/lesslesspin-kun-de-zhong-jie-greatergreater-du-hou/</id>
+        <link href="https://paul-gao.com/post/lesslesspin-kun-de-zhong-jie-greatergreater-du-hou/">
         </link>
         <updated>2021-06-28T05:57:23.000Z</updated>
         <content type="html"><![CDATA[<p>看完《贫困的终结》一书，对何为贫困，为何贫贫困有了一些新的视角，作者是深处扶贫第一线的亲历者，书中有亲身工作经验和各派学者对贫困的观点。</p>
@@ -270,8 +279,8 @@
     </entry>
     <entry>
         <title type="html"><![CDATA[Dan Olsen：怎样实现 PMF？]]></title>
-        <id>http://localhost:4000/post/dan-olsenzen-yang-shi-xian-pmf/</id>
-        <link href="http://localhost:4000/post/dan-olsenzen-yang-shi-xian-pmf/">
+        <id>https://paul-gao.com/post/dan-olsenzen-yang-shi-xian-pmf/</id>
+        <link href="https://paul-gao.com/post/dan-olsenzen-yang-shi-xian-pmf/">
         </link>
         <updated>2021-06-28T05:52:03.000Z</updated>
         <content type="html"><![CDATA[<h1 id="dan-olsen怎样实现-pmf">Dan Olsen：怎样实现 PMF？</h1>
