@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://paul-gao.com</id>
-    <title>Gridea</title>
-    <updated>2021-06-28T06:04:35.873Z</updated>
+    <title>PaulGao</title>
+    <updated>2021-06-28T06:07:20.789Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://paul-gao.com"/>
     <link rel="self" href="https://paul-gao.com/atom.xml"/>
-    <subtitle>PaulGao</subtitle>
     <logo>https://paul-gao.com/images/avatar.png</logo>
     <icon>https://paul-gao.com/favicon.ico</icon>
-    <rights>All rights reserved 2021, Gridea</rights>
+    <rights>All rights reserved 2021, PaulGao</rights>
     <entry>
         <title type="html"><![CDATA[搜索功能交互小结]]></title>
         <id>https://paul-gao.com/post/sou-suo-gong-neng-jiao-hu-xiao-jie/</id>
