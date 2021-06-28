@@ -1,0 +1,393 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>权限设计 - Gridea</title>
+<link rel="shortcut icon" href="https://paul-gao.com/favicon.ico">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.2.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css">
+<link rel="stylesheet" href="https://paul-gao.com/media/css/tailwind.css">
+<link rel="stylesheet" href="https://paul-gao.com/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="权限设计 - Gridea - Atom Feed" href="https://paul-gao.com/atom.xml">
+
+    
+
+  <meta name="description" content="文章来自网易UEDC – 蒋蕊遥。作者结合项目经历讲解RBAC权限系统设计实践。
+
+一、令人头疼的权限设计
+设计师在进行设计时，常常会抽象出对产品有诉求的多个角色，再依据角色的特性去梳理使用场景并设计。
+当角色之间的使用场景不冲突，不需要隔..." />
+  <meta property="og:title" content="权限设计 - Gridea">
+  <meta property="og:description" content="文章来自网易UEDC – 蒋蕊遥。作者结合项目经历讲解RBAC权限系统设计实践。
+
+一、令人头疼的权限设计
+设计师在进行设计时，常常会抽象出对产品有诉求的多个角色，再依据角色的特性去梳理使用场景并设计。
+当角色之间的使用场景不冲突，不需要隔..." />
+  <meta property="og:type" content="articles">
+  <meta property="og:url" content="https://paul-gao.com/post/quan-xian-she-ji/" />
+  <meta property="og:image" content="https://paul-gao.com/images/avatar.png">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:width" content="1200">
+  <meta name="twitter:title" content="权限设计 - Gridea">
+  <meta name="twitter:description" content="文章来自网易UEDC – 蒋蕊遥。作者结合项目经历讲解RBAC权限系统设计实践。
+
+一、令人头疼的权限设计
+设计师在进行设计时，常常会抽象出对产品有诉求的多个角色，再依据角色的特性去梳理使用场景并设计。
+当角色之间的使用场景不冲突，不需要隔...">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://paul-gao.com/post/quan-xian-she-ji/">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css">
+ 
+  
+
+  
+</head>
+
+<body>
+  <div class="antialiased flex flex-col min-h-screen" id="app">
+    <a href="https://paul-gao.com" class="fixed top-0 left-0 mt-4 bg-black text-white dark:text-gray-700 dark:bg-yellow-50 dark:hover:bg-black dark:hover:text-white inline-flex p-2 pl-8 hover:text-gray-700 hover:bg-yellow-50 font-bold z-10 transition-fast animated fadeInLeft">
+      Gridea
+    </a>
+    <div class="max-w-4xl w-full mx-auto">
+      <div class="shadow-box bg-white dark:bg-gray-600 rounded-lg pt-32 md:pt-64 px-4 md:px-8 pb-8 animated fadeIn mb-8">
+        <h1 class="text-5xl font-semibold leading-normal pb-8 mb-8 border-b-8 border-gray-700">
+          权限设计
+        </h1>
+        
+        <div class="mb-8 flex flex-wrap">
+          <div class="text-gray-400 text-sm mr-4">2021-06-28 · 12 min read</div>
+          
+        </div>
+        <div class="markdown mb-8" v-pre>
+          <p>文章来自网易UEDC – 蒋蕊遥。作者结合项目经历讲解RBAC权限系统设计实践。</p>
+<!-- more -->
+<h1 id="一-令人头疼的权限设计">一、令人头疼的权限设计</h1>
+<p>设计师在进行设计时，常常会抽象出对产品有诉求的多个角色，再依据角色的特性去梳理使用场景并设计。<br>
+当角色之间的使用场景不冲突，不需要隔离时，我们会综合考虑这些角色的使用场景来设计解决方案。比如：网易云音乐同时为需要听歌和听电台的用户，提供所有的功能。<br>
+当这些角色的使用场景完全不重叠、流程对立时，我们会设计完全独立的两套系统，如滴滴的司机端和乘客端。<br>
+但除了以上两种情况，在大多数 B 端产品中，基于流程公正性、信息安全性等因素考虑，各个角色的使用场景是部分通用，部分隔离的，这时候就需要引入「权限系统」了。</p>
+<figure data-type="image" tabindex="1"><img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gdxyn4edglj30u00hqgmd.jpg" alt="" loading="lazy"></figure>
+<p>设计师有时会对角色权限系统有一丝畏难情绪。</p>
+<ul>
+<li>一方面因为角色权限系统的配置作为一个非常后台的管理功能，在竞品调研过程中很难通过上帝视角去解剖其中逻辑，自己琢磨又较难透彻；</li>
+<li>另一方面对于角色权限系统，做好了并不能代表设计能力有多优秀，但一旦没做好就会导致整个流程不通、产品崩溃。所以设计师常对权限系统望而却步。<br>
+以下就笔者的几次权限设计经历，提供一些所谓的经验套路。</li>
+</ul>
+<h1 id="二-基于技术模型进行设计-rbac模型">二、基于技术模型进行设计-RBAC模型</h1>
+<p>进行设计前，最好能够理解技术模型。在业界接受度较高的功能权限模型是 RBAC（Role-Based Access Control）模型，其基本理念是将「角色」这个概念赋予用户，在系统中用户与权限之间通过角色进行关联，以这样的方法来实现灵活配置。以下就模型与设计相关的几点做一下简单介绍。</p>
+<h2 id="1-基本的rbac模型">1. 基本的RBAC模型</h2>
+<p>如果没有角色的概念，系统中每加入一个用户，就需要为这个用户配置一遍权限，下图是 wiki 中直接为用户权限管理方式，可以看出管理成本巨大。</p>
+<figure data-type="image" tabindex="2"><img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gdxyoer4vqj30u00hx75h.jpg" alt="" loading="lazy"></figure>
+<p>而引入「角色」概念后，如下图即是 RBAC 模型中最基本的模型：用户与角色可为多对一或多对多的关系，当一个用户的角色为多对多时，当前用户的权限是多个角色的并集。</p>
+<figure data-type="image" tabindex="3"><img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gdxyotsxmxj30qs0c176k.jpg" alt="" loading="lazy"></figure>
+<p>此时只需要为角色赋予权限，能够大大减轻管理负担，同时将用户与权限解耦，提供更大的灵活性。</p>
+<h2 id="2-引入用户组概念的rbac模型">2. 引入用户组概念的RBAC模型</h2>
+<p>在大型平台的应用上，试想如果用户量上万，新增一个角色时，可能需要为大量用户都分配一遍新的角色，工程量仍然巨大，此时即可以引入用户组的概念。如果部分用户的使用场景是相对一致和基础的，我们可以把这些用户打包成一个组，基于这个组的对象进行角色和权限的赋予。</p>
+<p>同理如果权限较多时也会存在一样的问题，处理方式是引入权限组的概念，将使用场景相对固定的一组功能或权限打包成组赋予角色。但是一般来讲一个系统中权限功能的体量是相对有限和可控的，所以实际应用中对权限组的使用较少。</p>
+<figure data-type="image" tabindex="4"><img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gdxyp5e3oxj30pz0fc0tx.jpg" alt="" loading="lazy"></figure>
+<p>下图所示为 mac 系统中运行添加用户组，并以用户组为单位配置权限。</p>
+<figure data-type="image" tabindex="5"><img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gdxyp75944j30qb08xjsj.jpg" alt="" loading="lazy"></figure>
+<p>需要注意的是即使有用户组或权限组的存在，也可以允许用户或权限与角色直接关联，这个可以视具体业务情况而定。</p>
+<h2 id="3-角色继承的rbac模型">3. 角色继承的RBAC模型</h2>
+<p>在一个业务场景中，如果角色需区分：设计主管、设计组长、设计成员，并且管理方式为向下兼容时，则需使用角色继承的 RBAC 模型。上层角色继承下层角色的全部权限，且可额外赋予权限。</p>
+<figure data-type="image" tabindex="6"><img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gdxypv0iu8j30ap0bndga.jpg" alt="" loading="lazy"></figure>
+<p>此时除了对角色进行定义，还需要管理角色间的关系，通过关系来体现角色的层级关系，从而达到继承权限的效果。角色的继承关系主要有两种：树形图和有向无环图。</p>
+<figure data-type="image" tabindex="7"><img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gdxyq2wwokj30r2096dgi.jpg" alt="" loading="lazy"></figure>
+<p>继承关系常常来源于公司团队的组织结构，此时常将角色与组织结构进行关联达到继承角色模型的效果。如下图所示的赵同学，其角色是「三级团队负责人」，与其并列的小组中有多个「三级团队负责人」的角色，但依附于左侧的组织结构树，各级负责人仅有查看和操作自己下属子节点的权限。</p>
+<figure data-type="image" tabindex="8"><img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gdxyqf6hd9j30rv0fgwg3.jpg" alt="" loading="lazy"></figure>
+<h2 id="4-限制的rbac模型">4. 限制的RBAC模型</h2>
+<p>在一个产品或系统中，部分角色可能是需要隔离的、不允许被同时赋予一个人的。跟大家熟知的不能既是「运动员」又是「裁判员」一个道理。</p>
+<p>因此，对于众多角色中的一组，只能是单选的关系，但多组角色之间可以共同存在。如下图中，一个用户可以既为设计师又为管理员，但在设计师角色组中仅能被赋予一个角色，在管理员角色组中也仅能被赋予一个角色。</p>
+<figure data-type="image" tabindex="9"><img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gdxyqmsjb0j30gc0bqgm1.jpg" alt="" loading="lazy"></figure>
+<p>此外，限制还有可能是数量上的，比如一个产品组中必须有且只有一个管理员，不允许删除或再分配管理员角色，仅允许将负责人角色变更。</p>
+<figure data-type="image" tabindex="10"><img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gdxyqwlh0nj30rr08c3z4.jpg" alt="" loading="lazy"></figure>
+<p>限制的模型不仅仅对分配过程产生影响，有时即使拥有了多种角色，因为不同的角色对同一个功能的使用方式或数据会产生冲突，所以使用时也需要进行限制。如下图所示为同一时间仅允许以一个身份登录。</p>
+<figure data-type="image" tabindex="11"><img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gdxyre9s6jj30ek0cz74q.jpg" alt="" loading="lazy"></figure>
+<p>根据不同的业务需求，限制的形式很多。需要注意的是不能仅依赖后端限制，而是要在前端展示清晰的规则和恰当的限制，避免用户出错和沮丧。</p>
+<h1 id="三-权限的拆分与设计">三、权限的拆分与设计</h1>
+<p>通过 RBAC 模型已经能够很好的搭建起用户、角色与权限之间的关系了。但具体是什么样的关系，以及「权限」这个抽象的概念具体如何规划？</p>
+<p>这些都需要分析清楚才能进一步设计出完善的权限系统。</p>
+<p>首先需要知道，一般产品的权限由页面、操作和数据构成。页面与操作相互关联，必须拥有页面权限，才能分配该页面下对应的操作权限。数据可被增删改查。</p>
+<p>整体关系如下图所示：</p>
+<figure data-type="image" tabindex="12"><img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gdxyrnscdmj30pg0fgmy6.jpg" alt="" loading="lazy"></figure>
+<p>因此，在设计之初我们就需要考虑到未来可能区分角色的地方，尽量解耦、模块化。对于技术来说，每一个页面模块、每一个操作都最好使用独立的接口。对于设计来说，需要保障所有角色因为权限而屏蔽掉部分操作和数据后，页面和流程仍能体验流畅。</p>
+<p>保证初期设计支持后，配置权限时，还需要注意以下几点：</p>
+<h2 id="1-确定是否支持前端配置">1. 确定是否支持前端配置</h2>
+<p>如果角色和权限相对固定，则一般将角色与权限的关系可以写在后台，改动时需要后端变更且重新上线。这种情况适用于公司内部系统等只有一个使用主体的系统。</p>
+<p>如果需要自定义角色或者每个角色在不同使用者的场景下有不同的权限，则需要将角色的定义、角色与权限之间的配置体现在「前端用户配置页面」。这种情况适用于有频繁变动的自定义角色权限，和有租户体系的系统。</p>
+<h2 id="2-以基本单元拆分以业务逻辑配置">2. 以基本单元拆分，以业务逻辑配置</h2>
+<p>一般可将每个对象的「增、删、改、查」各自作为一个基本的权限单元。打个比方，在「人员管理」中，查看人员列表、添加人员、删除人员、编辑人员信息最好拆分为4个权限单元。在技术和设计上，我们希望能尽量做到解耦和模块化。</p>
+<p>但是在业务层面有些操作却是一体的。这些不能拆开的权限在「前端用户配置页面」中建议打包成一个整体提供配置。例如：如果我们确定在系统的现有和未来业务中，仅分为普通成员有「人员管理」的查看权限，管理员有操作权限，则可将「增、删、改」三个基本权限单位合并为「操作」权限进行配置。</p>
+<h2 id="3-页面权限优先于操作和数据权限">3. 页面权限优先于操作和数据权限</h2>
+<p>必须配置了页面模块权限后，才能配置当前页面模块下具体的操作权限，以及页面模块的数据展示权限。</p>
+<h2 id="4-查看权限优先于增删改权限">4. 查看权限优先于增删改权限</h2>
+<p>正常情况下，一定要先能查看某个模块或操作，其它的增删改操作才有意义。因此在设计时，应在获取查看权限前限制其它权限的配置，或者配置其它权限时默认赋予查看权限。</p>
+<h2 id="5-角色与权限的多种关系">5. 角色与权限的多种关系</h2>
+<p>角色与权限的关系不仅是单纯「是/否关系」，还包括以某种限制进行操作，和以某种程度访问数据。</p>
+<p>例如在「人员管理」中：</p>
+<p>数据范围：用户拥有查看人员列表的权限，但仅能查看自己所在的团队；<br>
+数据边界限制（上限等）：添加人员时不能超过20个等。<br>
+数据字段：HR 能查看人员列表中包括职级、薪资等字段，其它角色仅能查看姓名邮箱等字段；</p>
+<h2 id="6-角色与权限的设计表达">6. 角色与权限的设计表达</h2>
+<p>在传达一个系统的权限设计规则时，设计师常常习惯用主观最直接的方式表达想法，如用「当……时，就……」的句式来表达。但一个平台中涉及的权限规则是非常多的，当通篇以这样的形式描述时，表达对象将很难理解。</p>
+<p>正确的描述方式：更清晰的是基于开发的语言，和技术模型的结果进行表达。将各角色与权限单元绘制成网格，每个交叉点网格中描述该角色与权限的数据关系和限制。</p>
+<p>如下图所示：</p>
+<figure data-type="image" tabindex="13"><img src="https://tva1.sinaimg.cn/large/007S8ZIlgy1gdxyrzq4cxj30u00f8wgs.jpg" alt="" loading="lazy"></figure>
+<h1 id="四-需要注意的tips">四、需要注意的Tips</h1>
+<h2 id="1-隐形的admin">1. 隐形的admin</h2>
+<p>在可自定义角色和权限的系统中，一般需要预留一个 admin 角色来进行系统的初始配置，用于添加首批的业务人员和配置基本的角色。</p>
+<p>有的系统中允许存在上帝视角的 admin 角色，则其可以作为「超级管理员」显示在角色配置的列表中。有的系统中不允许这种角色存在，则可将这种角色设置为隐形的状态，仅赋予维护系统的工作人员。</p>
+<h2 id="2-初始权限的赋予">2. 初始权限的赋予</h2>
+<p>对于允许用户自行加入的系统，需要设定一至多个默认的角色，有时可以是仅有最基础权限的「游客」角色。</p>
+<p>初始权限还可以与用户既有的某些数据字段进行关联，如添加用户时获取到用户的岗位为「设计师」，则直接赋予「设计师」角色的权限。</p>
+<h2 id="3-人员管理中对自己的处理">3. 人员管理中对自己的处理</h2>
+<p>在人员管理中，管理员角色处理自己时需要额外注意。因为如果修改或删除了自己角色后，可能导致系统没有管理角色，从而无法添加其他成员和正常运行。设计时可添加判断，当自己为唯一管理角色时，禁止编辑和删除。</p>
+<h2 id="4-无页面权限的提示">4. 无页面权限的提示</h2>
+<p>虽然可以通过页面权限限制直接隐藏当前用户没有权限的页面，但不能排除用户获取到权限外的 url 地址。当用户意外访问到没有权限的页面时务必提供「无权限」的提示，避免用户认为系统 bug。</p>
+<h1 id="五-总结">五、总结</h1>
+<p>总结一下，整个权限系统设计就是定义各个节点和节点间关系的过程。</p>
+<p>节点包括：</p>
+<p>用户；<br>
+用户组；<br>
+角色；<br>
+角色组；<br>
+权限（页面、操作、数据）；<br>
+权限组（页面、操作、数据）。<br>
+关系包括：</p>
+<p>是/否关系；<br>
+继承关系；<br>
+限制关系（互斥、范围限制、边界限制、字段限制……）；</p>
+
+        </div>
+        <!-- Share to Twitter, Weibo, Telegram -->
+        <div class="flex items-center">
+          <div class="mr-4 flex items-center">
+            <i class="ri-share-forward-line text-gray-500"></i>
+          </div>
+          <div class="px-4 cursor-pointer text-blue-500 hover:bg-blue-100 dark:hover:bg-gray-600 inline-flex" @click="shareToTwitter">
+            <i class="ri-twitter-line"></i>
+          </div>
+          <div class="px-4 cursor-pointer text-red-500 hover:bg-red-100 dark:hover:bg-gray-600 inline-flex" @click="shareToWeibo">
+            <i class="ri-weibo-line"></i>
+          </div>
+          <div class="px-4 cursor-pointer text-indigo-500 hover:bg-indigo-100 dark:hover:bg-gray-600 inline-flex" @click="shareToTelegram">
+            <i class="ri-telegram-line"></i>
+          </div>
+        </div>
+      </div>
+
+      
+
+      
+
+      <footer class="py-12 text-center px-4 md:px-0" v-pre>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</footer>
+    </div>
+
+    <!-- TOC Container -->
+    <div class="fixed right-0 bottom-0 mb-16 mr-4 shadow w-8 h-8 rounded-full flex justify-center items-center z-10 cursor-pointer bg-white dark:bg-gray-500 dark:text-gray-200 hover:shadow-lg transition-all animated fadeInRight" @click="showToc = true">
+      <i class="ri-file-list-line"></i>
+    </div>
+
+    <div class="fixed right-0 top-0 bottom-0 overflow-y-auto w-64 bg-white dark:bg-gray-800 p-4 border-l border-gray-100 dark:border-gray-600 z-10 transition-fast" :class="{ '-mr-64': !showToc }">
+      <div class="flex mb-4 justify-end">
+        <div class="w-8 h-8 inline-flex justify-center items-center rounded-full cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-fast" @click="showToc = false">
+          <i class="ri-close-line text-lg"></i>
+        </div>
+      </div>
+      <div class="post-toc-container">
+        <ul class="markdownIt-TOC">
+<li><a href="#%E4%B8%80-%E4%BB%A4%E4%BA%BA%E5%A4%B4%E7%96%BC%E7%9A%84%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1">一、令人头疼的权限设计</a></li>
+<li><a href="#%E4%BA%8C-%E5%9F%BA%E4%BA%8E%E6%8A%80%E6%9C%AF%E6%A8%A1%E5%9E%8B%E8%BF%9B%E8%A1%8C%E8%AE%BE%E8%AE%A1-rbac%E6%A8%A1%E5%9E%8B">二、基于技术模型进行设计-RBAC模型</a>
+<ul>
+<li><a href="#1-%E5%9F%BA%E6%9C%AC%E7%9A%84rbac%E6%A8%A1%E5%9E%8B">1. 基本的RBAC模型</a></li>
+<li><a href="#2-%E5%BC%95%E5%85%A5%E7%94%A8%E6%88%B7%E7%BB%84%E6%A6%82%E5%BF%B5%E7%9A%84rbac%E6%A8%A1%E5%9E%8B">2. 引入用户组概念的RBAC模型</a></li>
+<li><a href="#3-%E8%A7%92%E8%89%B2%E7%BB%A7%E6%89%BF%E7%9A%84rbac%E6%A8%A1%E5%9E%8B">3. 角色继承的RBAC模型</a></li>
+<li><a href="#4-%E9%99%90%E5%88%B6%E7%9A%84rbac%E6%A8%A1%E5%9E%8B">4. 限制的RBAC模型</a></li>
+</ul>
+</li>
+<li><a href="#%E4%B8%89-%E6%9D%83%E9%99%90%E7%9A%84%E6%8B%86%E5%88%86%E4%B8%8E%E8%AE%BE%E8%AE%A1">三、权限的拆分与设计</a>
+<ul>
+<li><a href="#1-%E7%A1%AE%E5%AE%9A%E6%98%AF%E5%90%A6%E6%94%AF%E6%8C%81%E5%89%8D%E7%AB%AF%E9%85%8D%E7%BD%AE">1. 确定是否支持前端配置</a></li>
+<li><a href="#2-%E4%BB%A5%E5%9F%BA%E6%9C%AC%E5%8D%95%E5%85%83%E6%8B%86%E5%88%86%E4%BB%A5%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E9%85%8D%E7%BD%AE">2. 以基本单元拆分，以业务逻辑配置</a></li>
+<li><a href="#3-%E9%A1%B5%E9%9D%A2%E6%9D%83%E9%99%90%E4%BC%98%E5%85%88%E4%BA%8E%E6%93%8D%E4%BD%9C%E5%92%8C%E6%95%B0%E6%8D%AE%E6%9D%83%E9%99%90">3. 页面权限优先于操作和数据权限</a></li>
+<li><a href="#4-%E6%9F%A5%E7%9C%8B%E6%9D%83%E9%99%90%E4%BC%98%E5%85%88%E4%BA%8E%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9D%83%E9%99%90">4. 查看权限优先于增删改权限</a></li>
+<li><a href="#5-%E8%A7%92%E8%89%B2%E4%B8%8E%E6%9D%83%E9%99%90%E7%9A%84%E5%A4%9A%E7%A7%8D%E5%85%B3%E7%B3%BB">5. 角色与权限的多种关系</a></li>
+<li><a href="#6-%E8%A7%92%E8%89%B2%E4%B8%8E%E6%9D%83%E9%99%90%E7%9A%84%E8%AE%BE%E8%AE%A1%E8%A1%A8%E8%BE%BE">6. 角色与权限的设计表达</a></li>
+</ul>
+</li>
+<li><a href="#%E5%9B%9B-%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84tips">四、需要注意的Tips</a>
+<ul>
+<li><a href="#1-%E9%9A%90%E5%BD%A2%E7%9A%84admin">1. 隐形的admin</a></li>
+<li><a href="#2-%E5%88%9D%E5%A7%8B%E6%9D%83%E9%99%90%E7%9A%84%E8%B5%8B%E4%BA%88">2. 初始权限的赋予</a></li>
+<li><a href="#3-%E4%BA%BA%E5%91%98%E7%AE%A1%E7%90%86%E4%B8%AD%E5%AF%B9%E8%87%AA%E5%B7%B1%E7%9A%84%E5%A4%84%E7%90%86">3. 人员管理中对自己的处理</a></li>
+<li><a href="#4-%E6%97%A0%E9%A1%B5%E9%9D%A2%E6%9D%83%E9%99%90%E7%9A%84%E6%8F%90%E7%A4%BA">4. 无页面权限的提示</a></li>
+</ul>
+</li>
+<li><a href="#%E4%BA%94-%E6%80%BB%E7%BB%93">五、总结</a></li>
+</ul>
+
+      </div>
+    </div>
+
+    <!-- Back to top -->
+    <div class="fixed right-0 bottom-0 mb-4 mr-4 shadow w-8 h-8 rounded-full flex justify-center items-center z-10 cursor-pointer bg-white hover:shadow-lg transition-all dark:bg-gray-500 dark:text-gray-200" @click="backToUp" v-show="scrolled">
+      <i class="ri-arrow-up-line"></i>
+    </div>
+  </div>
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+  <!-- Background of PhotoSwipe. 
+        It's a separate element as animating opacity is faster than rgba(). -->
+  <div class="pswp__bg">
+  </div>
+  <!-- Slides wrapper with overflow:hidden. -->
+  <div class="pswp__scroll-wrap">
+    <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+    <div class="pswp__container">
+      <div class="pswp__item">
+      </div>
+      <div class="pswp__item">
+      </div>
+      <div class="pswp__item">
+      </div>
+    </div>
+    <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+    <div class="pswp__ui pswp__ui--hidden">
+      <div class="pswp__top-bar">
+        <!--  Controls are self-explanatory. Order can be changed. -->
+        <div class="pswp__counter">
+        </div>
+        <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+        <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+        <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+        <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+        <!-- element will get class pswp__preloader--active when preloader is running -->
+        <div class="pswp__preloader">
+          <div class="pswp__preloader__icn">
+            <div class="pswp__preloader__cut">
+              <div class="pswp__preloader__donut">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+        <div class="pswp__share-tooltip">
+        </div>
+      </div>
+      <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+      </button>
+      <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+      </button>
+      <div class="pswp__caption">
+        <div class="pswp__caption__center">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://paul-gao.com/media/scripts/main.js"></script>
+  
+  <!-- Code Highlight -->
+  
+
+  <script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+  <script>
+    //拿到预览框架，也就是上面的html代码
+    var pswpElement = document.querySelectorAll('.pswp')[0];
+    //定义图片数组变量
+    var imgitems;
+    /**
+    * 用于显示预览界面
+    * @param index 图片数组下标
+    */
+    function viewImg(index) {
+      //其它选项这里不做过多阐述，详情见官网
+      var pswpoptions = {
+        index: parseInt(index, 10), // 开始幻灯片索引。0是第一张幻灯片。必须是整数，而不是字符串。
+        bgOpacity: 0.7, // 背景透明度，0-1
+        maxSpreadZoom: 3, // 缩放级别，不要太大
+      };
+      //初始化并打开PhotoSwipe，pswpElement对应上面预览框架，PhotoSwipeUI_Default为皮肤，imgitems为图片数组，pswpoptions为选项
+      var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, imgitems, pswpoptions);
+      gallery.init()
+    }
+    /**
+    * 用于添加图片点击事件
+    * @param img 图片元素
+    * @param index 所属下标（在imgitems中的位置）
+    */
+    function addImgClick(img, index) {
+      img.onclick = function() {
+        viewImg(index)
+      }
+    }
+    /**
+    * 轮询所有图片，获取src、width、height等数据，加入imgitems，并给图片元素添加事件
+    * 最好在onload中执行该方法，本站因放在最底部，所以直接初始化
+    * 异步加载图片可在图片元素创建完成后调用此方法
+    */
+    function initImg() {
+      //重置图片数组
+      imgitems = [];
+      //查找class:markdown 下的所有img元素并遍历
+      var imgs = document.querySelectorAll('.markdown img');
+      for (var i = 0; i < imgs.length; i++) {
+        var img = imgs[i];
+        //本站相册初始为loading图片，真实图片放在data-src
+        var ds = img.getAttribute("data-src");
+        //创建image对象，用于获取图片宽高
+        var imgtemp = new Image();
+        //判断是否存在data-src
+        if (ds != null && ds.length > 0) {
+          imgtemp.src = ds
+        } else {
+          imgtemp.src = img.src
+        }
+        //判断是否存在缓存
+        if (imgtemp.complete) {
+          var imgobj = {
+            "src": imgtemp.src,
+            "w": imgtemp.width,
+            "h": imgtemp.height,
+          };
+          imgitems[i] = imgobj;
+          addImgClick(img, i);
+        } else {
+          console.log('进来了2')
+          imgtemp.index = i;
+          imgtemp.img = img;
+          imgtemp.onload = function() {
+            var imgobj = {
+              "src": this.src,
+              "w": this.width,
+              "h": this.height,
+            };
+            //不要使用push，因为onload前后顺序会不同
+            imgitems[this.index] = imgobj
+            //添加点击事件
+            addImgClick(this.img, this.index);
+          }
+        }
+      }
+    }
+    //初始化
+    initImg();
+  </script>
+  
+  
+</body>
+
+</html>
