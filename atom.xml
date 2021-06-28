@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://paul-gao.com</id>
     <title>ℙ𝔸𝕌𝕃𝔾𝔸𝕆</title>
-    <updated>2021-06-28T07:13:21.887Z</updated>
+    <updated>2021-06-28T08:35:37.025Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://paul-gao.com"/>
     <link rel="self" href="https://paul-gao.com/atom.xml"/>
@@ -10,6 +10,47 @@
     <logo>https://paul-gao.com/images/avatar.png</logo>
     <icon>https://paul-gao.com/favicon.ico</icon>
     <rights>All rights reserved 2021, ℙ𝔸𝕌𝕃𝔾𝔸𝕆</rights>
+    <entry>
+        <title type="html"><![CDATA[Circle模型]]></title>
+        <id>https://paul-gao.com/post/circle-mo-xing/</id>
+        <link href="https://paul-gao.com/post/circle-mo-xing/">
+        </link>
+        <updated>2021-06-28T06:00:54.000Z</updated>
+        <content type="html"><![CDATA[<figure data-type="image" tabindex="1"><img src="https://static.gridea.dev/280522035228049932/5eKYSn7iG.png" alt="" loading="lazy"></figure>
+<p>原文链接：<a href="https://medium.com/whispir/how-our-cross-functional-teams-decide-what-to-build-at-whispir-e97757171e49">how our cross functional teams decide what to build at whispir</a><br>
+这个产品模型来自whispir团队。为了方便理解，以一个实际需求作为案例来对模型进行讲解。现有一个需求：为盲人设计一款冰箱。</p>
+<h1 id="1澄清需求">1.澄清需求</h1>
+<p>当接到上述需求时，切不可马上就如到方案的设计中，比如马上提出设计一个智能控制的冰箱等。至少需要明确要做一件什么是（what），为谁做（who），什么时候完成（when），为什么要做（why）。没有标准答案，可根据自己的经验，提出以下这些问题：</p>
+<ul>
+<li>盲人指的是全盲还是色弱等视觉障碍？</li>
+<li>他们是是什么年龄段的人？</li>
+<li>需要一款多大的冰箱？</li>
+<li>有多久的研发周期、研发成本预算？</li>
+<li>产品的销售价格定位？</li>
+<li>...</li>
+</ul>
+<h1 id="2用户画像">2.用户画像</h1>
+<p>通过步骤一明确谁是冰箱的使用者？他们的年龄？他们使用冰箱有何困难？他们使用冰箱做什么事情？等等。可以通过访问一些潜在客户，用户画像约具体越好。</p>
+<h1 id="3用户故事">3.用户故事</h1>
+<p>as a __ , I need ___,so I can ____. 作为什么角色的用户，我需要完成什么活动，因此实现什么价值。这个案例中用户故事：</p>
+<ul>
+<li>作为一个视障患者，我想快速找到东西</li>
+<li>作为一个视障患者，我不想打翻冰箱里的东西</li>
+<li>做一个视障患者，我想知道冰箱里的事物放了多久了</li>
+</ul>
+<h1 id="4需求优先级">4.需求优先级</h1>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNgy1gry265kehrj30ar086q3b.jpg" alt="" loading="lazy"><br>
+我们不能解决所有问题，智能权衡利弊后集中解决其中一些问题。把用户需求放在 JTBD（job to be done）坐标中，横轴代表重要程度，纵轴代表需求当前被满足程度。由此分为三个区域，从左往右分别是：过度满足、刚好满足、服务不足。<br>
+<img src="https://tva1.sinaimg.cn/large/008i3skNgy1gry1yzlzqnj30s10kt0ue.jpg" alt="" loading="lazy"></p>
+<h1 id="5解决方案清单">5.解决方案清单</h1>
+<p>确定我们要集中精力解决的问题后，列出可能的解决方案。</p>
+<h1 id="6方案评估">6.方案评估</h1>
+<p>对比上述各个方案的优缺点，比如成本、时间等。做成图标可视化地直观表现出对比结果。<br>
+https://tva1.sinaimg.cn/large/008i3skNgy1gry2cfdeeij30rl0eyt9r.jpg</p>
+<h1 id="7总结建议">7.总结建议</h1>
+<p>得出最后的结论，产品规划是一件确定的时间，想清楚后就需要获得资源进行产品开发。</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[搜索功能交互小结]]></title>
         <id>https://paul-gao.com/post/sou-suo-gong-neng-jiao-hu-xiao-jie/</id>
