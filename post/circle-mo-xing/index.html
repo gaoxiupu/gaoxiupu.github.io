@@ -126,6 +126,8 @@ as a __ , I need ___,so I can ____. 作为什么角色的用户，我需要完�
       
 
       
+        <div id="vlaine-comment"></div>
+      
 
       <footer class="py-12 text-center px-4 md:px-0" v-pre>
   
@@ -308,6 +310,23 @@ as a __ , I need ___,so I can ____. 作为什么角色的用户，我需要完�
     //初始化
     initImg();
   </script>
+  
+    <script type="application/javascript" src="https://unpkg.com/valine"></script>
+<script type="application/javascript">
+  new Valine({
+    el: '#vlaine-comment',
+    appId: '656jcn1rwytRaav4hs7BQ4Ct-gzGzoHsz',
+    appKey: 'deu4hfh60j5L5angnXbW7CRr',
+    pageSize: 10,
+    notify: false,
+    avatar: 'mp',
+    verify: false,
+    placeholder: '来都来了，不妨评论一下',
+    visitor: true,
+    highlight: false,
+    recordIP: true,
+  })
+</script>
   
   
 </body>
